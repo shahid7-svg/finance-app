@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Finance</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; }
+    header { background:#2e7d32; color:#fff; padding:15px; text-align:center; font-size:20px; }
+    .container { padding:15px; }
+    .card { background:#fff; border-radius:10px; padding:15px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .btn { background:#2e7d32; color:#fff; border:none; padding:8px 12px; border-radius:6px; margin-top:8px; }
+    .add-btn { position:fixed; bottom:20px; right:20px; background:#2e7d32; color:#fff; font-size:24px; border-radius:50%; width:55px; height:55px; border:none; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    .modal-content { background:#fff; margin:15% auto; padding:15px; width:90%; border-radius:10px; }
+    input { width:100%; padding:8px; margin:6px 0; }
+  </style>
+</head>
+<body><div class="modal" id="pinModal">
+  <div class="modal-content">
+    <h3>Enter PIN</h3>
+    <input id="pinInput" type="password" placeholder="Enter 4-digit PIN" />
+    <button class="btn" onclick="checkPin()">Unlock</button>
+  </div>
+</div><header>My Finance</header>
+<div class="container" id="list"></div>
+<button class="add-btn" onclick="openForm()">+</button><div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Add Person</h3>
+    <input id="name" placeholder="Name" />
+    <input id="amount" type="number" placeholder="Amount Given" />
+    <input id="monthly" type="number" placeholder="Monthly Due" />
+    <input id="date" placeholder="Due Date (number only, eg 5)" />
+    <button class="btn" onclick="save()">Save</button>
+  </div>
+</div><script>
+let data = JSON.parse(localStorage.getItem('finance')||'[]');
+let pin = localStorage.getItem('pin') || '1234';
+
+function checkPin(){ if(pinInput.value===pin){ pinModal.style.display='none'; render(); } else alert('Wrong PIN'); }
+
+function render(){
+  list.innerHTML='';
+  const today = new Date();
+  const day = today.getDate();
+  const monthKey = today.getMonth()+"-"+today.getFullYear();
+
+  data.forEach((p,i)=>{
+    // AUTO MONTHLY INTEREST LOGIC
+    if(!p.lastInterestMonth){ p.lastInterestMonth = ''; }
+    if(p.interest && p.lastInterestMonth !== monthKey){
+      const interestAmount = Math.round((p.amount * p.interest)/100);
+      p.amount += interestAmount;
+      p.lastInterestMonth = monthKey;
+      alert(`Auto Interest Added: ₹${interestAmount} added to ${p.name}`);
+      localStorage.setItem('finance', JSON.stringify(data));
+    }
+
+    // REMINDER
+    if(parseInt(p.date) === day){
+      alert(`Reminder: Collect ₹${p.monthly} from ${p.name}`);
+    }
+
+    list.innerHTML += `<div class='card'>
+      <b>${p.name}</b>
+      <div>Total Amount: ₹${p.amount}</div>
+      <div>Monthly Due: ₹${p.monthly} on ${p.date}</div>
+      <button class='btn' onclick='paid(${i})'>Mark Paid</button>
+    </div>`;
+  });
+}
+    list.innerHTML+=`<div class='card'><b>${p.name}</b><div>₹${p.amount} given</div><div>Due: ₹${p.monthly} on ${p.date}</div><button class='btn' onclick='paid(${i})'>Mark Paid</button></div>`;
+  });
+}
+
+function openForm(){ modal.style.display='block'; }
+function save(){ data.push({name:name.value,amount:amount.value,monthly:monthly.value,date:date.value}); localStorage.setItem('finance',JSON.stringify(data)); modal.style.display='none'; render(); }
+function paid(i){ alert(`Payment received from ${data[i].name}`); }
+
+pinModal.style.display='block';
+</script></body>
+</html><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Finance</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; }
+    header { background:#2e7d32; color:#fff; padding:15px; text-align:center; font-size:20px; }
+    .container { padding:15px; }
+    .card { background:#fff; border-radius:10px; padding:15px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .btn { background:#2e7d32; color:#fff; border:none; padding:8px 12px; border-radius:6px; margin-top:8px; }
+    .add-btn { position:fixed; bottom:20px; right:20px; background:#2e7d32; color:#fff; font-size:24px; border-radius:50%; width:55px; height:55px; border:none; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    .modal-content { background:#fff; margin:15% auto; padding:15px; width:90%; border-radius:10px; }
+    input { width:100%; padding:8px; margin:6px 0; }
+  </style>
+</head>
+<body><div class="modal" id="pinModal">
+  <div class="modal-content">
+    <h3>Enter PIN</h3>
+    <input id="pinInput" type="password" placeholder="Enter 4-digit PIN" />
+    <button class="btn" onclick="checkPin()">Unlock</button>
+  </div>
+</div><header>My Finance</header>
+<div class="container" id="list"></div>
+<button class="add-btn" onclick="openForm()">+</button><div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Add Person</h3>
+    <input id="name" placeholder="Name" />
+    <input id="amount" type="number" placeholder="Amount Given" />
+    <input id="monthly" type="number" placeholder="Monthly Due" />
+    <input id="date" placeholder="Due Date (number only, eg 5)" />
+    <button class="btn" onclick="save()">Save</button>
+  </div>
+</div><script>
+let data = JSON.parse(localStorage.getItem('finance')||'[]');
+let pin = localStorage.getItem('pin') || '1234';
+
+function checkPin(){ if(pinInput.value===pin){ pinModal.style.display='none'; render(); } else alert('Wrong PIN'); }
+
+function render(){
+  list.innerHTML='';
+  const today = new Date();
+  const day = today.getDate();
+  const monthKey = today.getMonth()+"-"+today.getFullYear();
+
+  data.forEach((p,i)=>{
+    // AUTO MONTHLY INTEREST LOGIC
+    if(!p.lastInterestMonth){ p.lastInterestMonth = ''; }
+    if(p.interest && p.lastInterestMonth !== monthKey){
+      const interestAmount = Math.round((p.amount * p.interest)/100);
+      p.amount += interestAmount;
+      p.lastInterestMonth = monthKey;
+      alert(`Auto Interest Added: ₹${interestAmount} added to ${p.name}`);
+      localStorage.setItem('finance', JSON.stringify(data));
+    }
+
+    // REMINDER
+    if(parseInt(p.date) === day){
+      alert(`Reminder: Collect ₹${p.monthly} from ${p.name}`);
+    }
+
+    list.innerHTML += `<div class='card'>
+      <b>${p.name}</b>
+      <div>Total Amount: ₹${p.amount}</div>
+      <div>Monthly Due: ₹${p.monthly} on ${p.date}</div>
+      <button class='btn' onclick='paid(${i})'>Mark Paid</button>
+    </div>`;
+  });
+}
+    list.innerHTML+=`<div class='card'><b>${p.name}</b><div>₹${p.amount} given</div><div>Due: ₹${p.monthly} on ${p.date}</div><button class='btn' onclick='paid(${i})'>Mark Paid</button></div>`;
+  });
+}
+
+function openForm(){ modal.style.display='block'; }
+function save(){ data.push({name:name.value,amount:amount.value,monthly:monthly.value,date:date.value}); localStorage.setItem('finance',JSON.stringify(data)); modal.style.display='none'; render(); }
+function paid(i){ alert(`Payment received from ${data[i].name}`); }
+
+pinModal.style.display='block';
+</script></body>
+</html><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Finance</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; }
+    header { background:#2e7d32; color:#fff; padding:15px; text-align:center; font-size:20px; }
+    .container { padding:15px; }
+    .card { background:#fff; border-radius:10px; padding:15px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .btn { background:#2e7d32; color:#fff; border:none; padding:8px 12px; border-radius:6px; margin-top:8px; }
+    .add-btn { position:fixed; bottom:20px; right:20px; background:#2e7d32; color:#fff; font-size:24px; border-radius:50%; width:55px; height:55px; border:none; }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    .modal-content { background:#fff; margin:15% auto; padding:15px; width:90%; border-radius:10px; }
+    input { width:100%; padding:8px; margin:6px 0; }
+  </style>
+</head>
+<body><div class="modal" id="pinModal">
+  <div class="modal-content">
+    <h3>Enter PIN</h3>
+    <input id="pinInput" type="password" placeholder="Enter 4-digit PIN" />
+    <button class="btn" onclick="checkPin()">Unlock</button>
+  </div>
+</div><header>My Finance</header>
+<div class="container" id="list"></div>
+<button class="add-btn" onclick="openForm()">+</button><div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Add Person</h3>
+    <input id="name" placeholder="Name" />
+    <input id="amount" type="number" placeholder="Amount Given" />
+    <input id="monthly" type="number" placeholder="Monthly Due" />
+    <input id="date" placeholder="Due Date (number only, eg 5)" />
+    <button class="btn" onclick="save()">Save</button>
+  </div>
+</div><script>
+let data = JSON.parse(localStorage.getItem('finance')||'[]');
+let pin = localStorage.getItem('pin') || '1234';
+
+function checkPin(){ if(pinInput.value===pin){ pinModal.style.display='none'; render(); } else alert('Wrong PIN'); }
+
+function render(){
+  list.innerHTML='';
+  const today = new Date();
+  const day = today.getDate();
+  const monthKey = today.getMonth()+"-"+today.getFullYear();
+
+  data.forEach((p,i)=>{
+    // AUTO MONTHLY INTEREST LOGIC
+    if(!p.lastInterestMonth){ p.lastInterestMonth = ''; }
+    if(p.interest && p.lastInterestMonth !== monthKey){
+      const interestAmount = Math.round((p.amount * p.interest)/100);
+      p.amount += interestAmount;
+      p.lastInterestMonth = monthKey;
+      alert(`Auto Interest Added: ₹${interestAmount} added to ${p.name}`);
+      localStorage.setItem('finance', JSON.stringify(data));
+    }
+
+    // REMINDER
+    if(parseInt(p.date) === day){
+      alert(`Reminder: Collect ₹${p.monthly} from ${p.name}`);
+    }
+
+    list.innerHTML += `<div class='card'>
+      <b>${p.name}</b>
+      <div>Total Amount: ₹${p.amount}</div>
+      <div>Monthly Due: ₹${p.monthly} on ${p.date}</div>
+      <button class='btn' onclick='paid(${i})'>Mark Paid</button>
+    </div>`;
+  });
+}
+    list.innerHTML+=`<div class='card'><b>${p.name}</b><div>₹${p.amount} given</div><div>Due: ₹${p.monthly} on ${p.date}</div><button class='btn' onclick='paid(${i})'>Mark Paid</button></div>`;
+  });
+}
+
+function openForm(){ modal.style.display='block'; }
+function save(){ data.push({name:name.value,amount:amount.value,monthly:monthly.value,date:date.value}); localStorage.setItem('finance',JSON.stringify(data)); modal.style.display='none'; render(); }
+function paid(i){ alert(`Payment received from ${data[i].name}`); }
+
+pinModal.style.display='block';
+</script></body>
+</html>
